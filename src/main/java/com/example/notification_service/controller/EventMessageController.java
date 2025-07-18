@@ -1,5 +1,7 @@
-package com.example.notification_service.entity;
+package com.example.notification_service.controller;
 
+import com.example.notification_service.entity.EventMessage;
+import com.example.notification_service.entity.EventMessageConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +14,14 @@ public class EventMessageController {
 
     private final KafkaTemplate<String, EventMessage> kafkaTemplate;
 
+    private final EventMessageConsumer consumer;
+
     private static final Logger logger = LoggerFactory.getLogger(EventMessageController.class);
 
-    public EventMessageController(KafkaTemplate<String, EventMessage> kafkaTemplate) {
+    public EventMessageController(KafkaTemplate<String, EventMessage> kafkaTemplate,
+                                  EventMessageConsumer consumer) {
         this.kafkaTemplate = kafkaTemplate;
+        this.consumer = consumer;
     }
 
     @PostMapping
@@ -28,5 +34,11 @@ public class EventMessageController {
             logger.error("Failed to sent message", e);
             return ResponseEntity.badRequest().body("Event sending failed");
         }
+    }
+
+    @GetMapping
+    public void consume() {
+        EventMessage eventMessage = consumer.getAllMessages().get(0);
+        System.out.println("Consumed message: " + eventMessage.toString());
     }
 }

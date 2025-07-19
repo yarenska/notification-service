@@ -11,8 +11,8 @@ public class KafkaTopic {
     @Bean
     public NewTopic newTopic() {
         return TopicBuilder.name("custom-events")
-                .replicas(3)
-                .partitions(1)
+                .replicas(1) //For simplicity and non-production setup
+                .partitions(3) //Since I configured to concurrency to 3, each consumer thread will read from one 1 partition
                 .config("retention.ms", "86400000") // 1 day
                 .config("cleanup.policy", "delete") // or "compact"
                 .build();

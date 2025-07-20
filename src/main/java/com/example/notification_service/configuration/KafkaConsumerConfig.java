@@ -1,6 +1,5 @@
 package com.example.notification_service.configuration;
 
-import com.example.notification_service.entity.PaymentConfirmation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;

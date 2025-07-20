@@ -2,19 +2,34 @@ spring:
   application:
     name: notification-service
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # as an example
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: events-consumer-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
     properties:
-      spring.json.trusted.packages: '*'
-      spring.json.use.type.headers: false
-      spring.json.value.default.type: com.example.notification_service.entity.EventMessage
+      spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+      spring.json.trusted.packages: com.example.notification_service.entity
+      spring.json.type.mapping: paymentConfirmation:com.example.notification_service.entity.PaymentConfirmation,discountCampaign:com.example.notification_service.entity.DiscountCampaign
+      spring.json.use.type.headers: true
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: false
+        spring.json.add.type.headers: true
+
+server:
+  port: 8081

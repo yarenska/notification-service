@@ -1,6 +1,6 @@
 package com.example.notification_service.configuration;
 
-import com.example.notification_service.entity.EventMessage;
+import com.example.notification_service.entity.PaymentConfirmation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -13,10 +13,10 @@ import org.springframework.util.backoff.FixedBackOff;
 public class KafkaConsumerConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, EventMessage> kafkaListenerContainerFactory(
-            DefaultKafkaConsumerFactory<String, EventMessage> kafkaConsumerFactory) {
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
+            DefaultKafkaConsumerFactory<String, Object> kafkaConsumerFactory) {
 
-        final ConcurrentKafkaListenerContainerFactory<String, EventMessage> containerFactory
+        final ConcurrentKafkaListenerContainerFactory<String, Object> containerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         containerFactory.setConsumerFactory(kafkaConsumerFactory);
         containerFactory.setConcurrency(3); // number of concurrent consumers

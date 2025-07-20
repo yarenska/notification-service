@@ -1,6 +1,6 @@
 package com.example.notification_service.configuration;
 
-import com.example.notification_service.entity.EventMessage;
+import com.example.notification_service.entity.PaymentConfirmation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -12,8 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 public class KafkaProducerConfig {
 
     @Bean
-    public KafkaTemplate<String, EventMessage> kafkaTemplate(
-            DefaultKafkaProducerFactory<String, EventMessage> producerFactory) {
+    public KafkaTemplate<String, Object> kafkaTemplate(
+            DefaultKafkaProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

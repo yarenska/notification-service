@@ -12,16 +12,28 @@ import java.util.List;
 @Component
 public class EventMessageConsumer {
 
-    private final List<EventMessage> consumedMessages = new LinkedList<>();
+    private final List<PaymentConfirmation> consumedPaymentConfirmationConfirmations = new LinkedList<>();
+    private final List<DiscountCampaign> consumedDiscountCampaigns = new LinkedList<>();
 
-    @KafkaListener(topics = "custom-events", groupId = "events-consumer-group")
-    public void consume(ConsumerRecord<String, EventMessage> record, Acknowledgment ack) {
-        EventMessage message = record.value();
-        consumedMessages.add(message);
+    @KafkaListener(topics = "payment-confirmation-events", groupId = "transaction-group")
+    public void consumePaymentConfirmationEvents(ConsumerRecord<String, PaymentConfirmation> record, Acknowledgment ack) {
+        PaymentConfirmation paymentConfirmation = record.value();
+        consumedPaymentConfirmationConfirmations.add(paymentConfirmation);
         ack.acknowledge(); // manual ack
     }
 
-    public List<EventMessage> getAllMessages() {
-        return Collections.unmodifiableList(consumedMessages);
+    @KafkaListener(topics = "discount-campaign-events", groupId = "marketing-group")
+    public void consumeDiscountCampaignEvents(ConsumerRecord<String, DiscountCampaign> record, Acknowledgment ack) {
+        DiscountCampaign discountCampaign = record.value();
+        consumedDiscountCampaigns.add(discountCampaign);
+        ack.acknowledge(); // manual ack
+    }
+
+    public List<PaymentConfirmation> getAllPaymentConfirmationEvents () {
+        return Collections.unmodifiableList(consumedPaymentConfirmationConfirmations);
+    }
+
+    public List<DiscountCampaign> getAllDiscountCampaignEvents () {
+        return Collections.unmodifiableList(consumedDiscountCampaigns);
     }
 }

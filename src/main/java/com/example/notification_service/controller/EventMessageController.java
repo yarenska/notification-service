@@ -1,44 +1,55 @@
 package com.example.notification_service.controller;
 
-import com.example.notification_service.entity.EventMessage;
+import com.example.notification_service.entity.DiscountCampaign;
+import com.example.notification_service.entity.PaymentConfirmation;
 import com.example.notification_service.entity.EventMessageConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.notification_service.service.EventMessageService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventMessageController {
 
-    private final KafkaTemplate<String, EventMessage> kafkaTemplate;
-
     private final EventMessageConsumer consumer;
 
-    private static final Logger logger = LoggerFactory.getLogger(EventMessageController.class);
+    private final EventMessageService eventMessageService;
 
-    public EventMessageController(KafkaTemplate<String, EventMessage> kafkaTemplate,
-                                  EventMessageConsumer consumer) {
-        this.kafkaTemplate = kafkaTemplate;
+    public EventMessageController(EventMessageConsumer consumer,
+                                  EventMessageService eventMessageService) {
         this.consumer = consumer;
+        this.eventMessageService = eventMessageService;
     }
 
-    @PostMapping
-    public ResponseEntity<String> sendEventMessage(@RequestBody EventMessage eventMessage) {
+    @PostMapping("/payment-confirmation")
+    public ResponseEntity<String> sendPaymentEventMessage(@RequestBody PaymentConfirmation paymentConfirmation) {
         try {
-            kafkaTemplate.send("custom-events", eventMessage);
-            logger.info("Event sent successfully");
-            return ResponseEntity.ok("Event sent successfully");
+            eventMessageService.savePaymentConfirmation(paymentConfirmation);
+            return ResponseEntity.ok("PaymentConfirmation confirmation event sent successfully");
         } catch (Exception e) {
-            logger.error("Failed to sent message", e);
             return ResponseEntity.badRequest().body("Event sending failed");
         }
     }
 
-    @GetMapping
-    public void consume() {
-        EventMessage eventMessage = consumer.getAllMessages().get(0);
-        System.out.println("Consumed message: " + eventMessage.toString());
+    @PostMapping("/discount-campaign")
+    public ResponseEntity<String> sendDiscountCampaignEventMessage(@RequestBody DiscountCampaign discountCampaign) {
+        try {
+            eventMessageService.saveDiscountCampaign(discountCampaign);
+            return ResponseEntity.ok("Discount campaign event sent successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Event sending failed");
+        }
+    }
+
+    @GetMapping(value = "/payment-confirmation")
+    public void consumePayment() {
+        PaymentConfirmation paymentConfirmation = consumer.getAllPaymentConfirmationEvents().get(0);
+        System.out.println("Consumed message: " + paymentConfirmation.toString());
+    }
+
+    @GetMapping("/discount-campaign")
+    public void consumeDiscount() {
+        DiscountCampaign discountCampaign = consumer.getAllDiscountCampaignEvents().get(0);
+        System.out.println("Consumed message: " + discountCampaign.toString());
     }
 }
